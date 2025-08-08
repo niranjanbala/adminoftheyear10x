@@ -1,9 +1,16 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
-  "/api/auth/refresh/route": "app/api/auth/refresh/route.js",
   "/api/auth/logout/route": "app/api/auth/logout/route.js",
-  "/api/auth/hubspot/initiate/route": "app/api/auth/hubspot/initiate/route.js",
+  "/api/auth/refresh/route": "app/api/auth/refresh/route.js",
   "/api/auth/hubspot/callback/route": "app/api/auth/hubspot/callback/route.js",
-  "/auth/error/page": "app/auth/error/page.js",
-  "/page": "app/page.js"
+  "/api/auth/hubspot/initiate/route": "app/api/auth/hubspot/initiate/route.js",
+  "/api/users/media/upload/route": "app/api/users/media/upload/route.js",
+  "/api/users/profile/route": "app/api/users/profile/route.js",
+  "/api/competitions/[id]/route": "app/api/competitions/[id]/route.js",
+  "/api/competitions/route": "app/api/competitions/route.js",
+  "/competitions/[id]/page": "app/competitions/[id]/page.js",
+  "/competitions/page": "app/competitions/page.js",
+  "/profile/page": "app/profile/page.js",
+  "/page": "app/page.js",
+  "/auth/error/page": "app/auth/error/page.js"
 }

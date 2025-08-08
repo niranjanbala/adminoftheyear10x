@@ -138,6 +138,7 @@ describe('Participation System', () => {
         })
       })
 
+      const { ParticipationForm } = await import('@/components/competitions/participation-form')
       render(<ParticipationForm {...defaultProps} />)
       
       // Fill in form
@@ -156,7 +157,8 @@ describe('Participation System', () => {
       })
     })
 
-    it('manages portfolio links correctly', () => {
+    it('manages portfolio links correctly', async () => {
+      const { ParticipationForm } = await import('@/components/competitions/participation-form')
       render(<ParticipationForm {...defaultProps} />)
       
       // Initially has one empty link field
@@ -212,6 +214,7 @@ describe('Participation System', () => {
     })
 
     it('renders participant management interface', async () => {
+      const { ParticipantManagement } = await import('@/components/competitions/participant-management')
       render(<ParticipantManagement {...defaultProps} />)
       
       expect(screen.getByText('Participant Management')).toBeInTheDocument()
@@ -237,6 +240,7 @@ describe('Participation System', () => {
           })
         })
 
+      const { ParticipantManagement } = await import('@/components/competitions/participant-management')
       render(<ParticipantManagement {...defaultProps} />)
       
       await waitFor(() => {
@@ -274,6 +278,7 @@ describe('Participation System', () => {
           })
         })
 
+      const { ParticipantManagement } = await import('@/components/competitions/participant-management')
       render(<ParticipantManagement {...defaultProps} />)
       
       await waitFor(() => {
@@ -295,6 +300,7 @@ describe('Participation System', () => {
     })
 
     it('shows different tabs for different participant statuses', async () => {
+      const { ParticipantManagement } = await import('@/components/competitions/participant-management')
       render(<ParticipantManagement {...defaultProps} />)
       
       expect(screen.getByText(/Pending \(1\)/)).toBeInTheDocument()
@@ -330,6 +336,7 @@ describe('Participation System', () => {
         json: async () => [mockParticipation]
       })
 
+      const { ParticipationStatus } = await import('@/components/competitions/participation-status')
       render(<ParticipationStatus {...defaultProps} />)
       
       await waitFor(() => {
@@ -353,6 +360,7 @@ describe('Participation System', () => {
         json: async () => [approvedParticipation]
       })
 
+      const { ParticipationStatus } = await import('@/components/competitions/participation-status')
       render(<ParticipationStatus {...defaultProps} />)
       
       await waitFor(() => {
@@ -376,6 +384,7 @@ describe('Participation System', () => {
           })
         })
 
+      const { ParticipationStatus } = await import('@/components/competitions/participation-status')
       render(<ParticipationStatus {...defaultProps} />)
       
       await waitFor(() => {
@@ -407,6 +416,7 @@ describe('Participation System', () => {
       })
 
       const onSuccess = jest.fn()
+      const { ParticipationForm } = await import('@/components/competitions/participation-form')
       render(
         <ParticipationForm
           competitionId="comp-1"
@@ -438,6 +448,7 @@ describe('Participation System', () => {
         })
       })
 
+      const { ParticipationForm } = await import('@/components/competitions/participation-form')
       render(
         <ParticipationForm
           competitionId="comp-1"

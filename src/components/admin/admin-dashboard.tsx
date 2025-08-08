@@ -75,7 +75,7 @@ export function AdminDashboard() {
       <div className="text-center py-12">
         <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
         <h2 className="text-2xl font-bold mb-2">Access Denied</h2>
-        <p className="text-muted-foreground">You don't have permission to access the admin dashboard.</p>
+        <p className="text-muted-foreground">You don&apos;t have permission to access the admin dashboard.</p>
       </div>
     )
   }

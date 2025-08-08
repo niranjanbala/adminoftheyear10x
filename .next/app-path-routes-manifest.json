@@ -1,9 +1,0 @@
-{
-  "/_not-found/page": "/_not-found",
-  "/api/auth/refresh/route": "/api/auth/refresh",
-  "/api/auth/logout/route": "/api/auth/logout",
-  "/api/auth/hubspot/initiate/route": "/api/auth/hubspot/initiate",
-  "/api/auth/hubspot/callback/route": "/api/auth/hubspot/callback",
-  "/auth/error/page": "/auth/error",
-  "/page": "/"
-}

@@ -1,5 +1,3 @@
-'use client'
-
 import { ProtectedRoute } from '@/components/auth/protected-route'
 import { CompetitionDetail } from '@/components/competitions/competition-detail'
 

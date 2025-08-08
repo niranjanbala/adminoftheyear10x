@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -41,7 +41,7 @@ export function UserManagement({ initialUsers = [] }: UserManagementProps) {
 
   useEffect(() => {
     fetchUsers()
-  }, [searchTerm, roleFilter, verificationFilter, suspendedFilter])
+  }, [searchTerm, roleFilter, verificationFilter, suspendedFilter, fetchUsers])
 
   const fetchUsers = async () => {
     setIsLoading(true)
@@ -152,7 +152,7 @@ export function UserManagement({ initialUsers = [] }: UserManagementProps) {
       <div className="text-center py-12">
         <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
         <h2 className="text-2xl font-bold mb-2">Access Denied</h2>
-        <p className="text-muted-foreground">You don't have permission to manage users.</p>
+        <p className="text-muted-foreground">You don&apos;t have permission to manage users.</p>
       </div>
     )
   }

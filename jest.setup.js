@@ -1,5 +1,24 @@
 import '@testing-library/jest-dom'
 
+// Mock fetch globally
+global.fetch = jest.fn()
+
+// Mock Request and Response for API tests
+global.Request = jest.fn().mockImplementation((url, options) => ({
+  url,
+  method: options?.method || 'GET',
+  headers: new Headers(options?.headers),
+  json: jest.fn().mockResolvedValue({}),
+  text: jest.fn().mockResolvedValue(''),
+}))
+
+global.Response = jest.fn().mockImplementation((body, options) => ({
+  ok: options?.status ? options.status < 400 : true,
+  status: options?.status || 200,
+  json: jest.fn().mockResolvedValue(body),
+  text: jest.fn().mockResolvedValue(body),
+}))
+
 // Mock Next.js router
 jest.mock('next/navigation', () => ({
   useRouter() {
