@@ -67,24 +67,105 @@ export const userService = {
 
 // Competition operations
 export const competitionService = {
+  // Client-side methods (for frontend components)
   async getAll(filters?: {
     tier?: string
     country?: string
     status?: string
   }): Promise<Competition[]> {
-    let query = supabase.from('competitions').select('*')
+    const params = new URLSearchParams()
+    if (filters?.tier) params.append('tier', filters.tier)
+    if (filters?.country) params.append('country', filters.country)
+    if (filters?.status) params.append('status', filters.status)
+
+    const response = await fetch(`/api/competitions?${params.toString()}`)
+    if (!response.ok) {
+      throw new Error('Failed to fetch competitions')
+    }
+    return response.json()
+  },
+
+  async getById(id: string): Promise<Competition | null> {
+    const response = await fetch(`/api/competitions/${id}`)
+    if (!response.ok) {
+      if (response.status === 404) return null
+      throw new Error('Failed to fetch competition')
+    }
+    return response.json()
+  },
+
+  async create(competitionData: any): Promise<Competition> {
+    const response = await fetch('/api/competitions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(competitionData),
+    })
     
-    if (filters?.tier) query = query.eq('tier', filters.tier)
-    if (filters?.country) query = query.eq('country', filters.country)
-    if (filters?.status) query = query.eq('status', filters.status)
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'Failed to create competition')
+    }
     
-    const { data, error } = await query.order('created_at', { ascending: false })
+    return response.json()
+  },
+
+  async update(id: string, updates: any): Promise<Competition> {
+    const response = await fetch(`/api/competitions/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updates),
+    })
     
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'Failed to update competition')
+    }
+    
+    return response.json()
+  },
+
+  async delete(id: string): Promise<void> {
+    const response = await fetch(`/api/competitions/${id}`, {
+      method: 'DELETE',
+    })
+    
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'Failed to delete competition')
+    }
+  },
+
+  // Server-side methods (for API routes)
+  async getAllDirect(filters?: {
+    tier?: string
+    country?: string
+    status?: string
+  }): Promise<Competition[]> {
+    let query = supabase
+      .from('competitions')
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    if (filters?.tier) {
+      query = query.eq('tier', filters.tier)
+    }
+    if (filters?.country) {
+      query = query.eq('country', filters.country)
+    }
+    if (filters?.status) {
+      query = query.eq('status', filters.status)
+    }
+
+    const { data, error } = await query
     if (error) throw error
     return data
   },
 
-  async getById(id: string): Promise<Competition | null> {
+  async getByIdDirect(id: string): Promise<Competition | null> {
     const { data, error } = await supabase
       .from('competitions')
       .select('*')
@@ -95,7 +176,7 @@ export const competitionService = {
     return data
   },
 
-  async create(competitionData: Tables['competitions']['Insert']): Promise<Competition> {
+  async createDirect(competitionData: Tables['competitions']['Insert']): Promise<Competition> {
     const { data, error } = await supabase
       .from('competitions')
       .insert(competitionData)
@@ -106,7 +187,7 @@ export const competitionService = {
     return data
   },
 
-  async update(id: string, updates: Tables['competitions']['Update']): Promise<Competition> {
+  async updateDirect(id: string, updates: Tables['competitions']['Update']): Promise<Competition> {
     const { data, error } = await supabase
       .from('competitions')
       .update(updates)
@@ -116,6 +197,22 @@ export const competitionService = {
     
     if (error) throw error
     return data
+  },
+
+  async deleteDirect(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('competitions')
+      .delete()
+      .eq('id', id)
+    
+    if (error) throw error
+  },
+
+  async updateStatus(id: string, status: string): Promise<Competition> {
+    return this.updateDirect(id, { 
+      status: status as any,
+      updated_at: new Date().toISOString()
+    })
   },
 
   async getLeaderboard(competitionId: string) {
@@ -155,6 +252,55 @@ export const competitionService = {
 
 // Participation operations
 export const participationService = {
+  // Client-side methods (for frontend components)
+  async apply(competitionId: string, applicationData: any): Promise<Participation> {
+    const response = await fetch(`/api/competitions/${competitionId}/participants`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(applicationData),
+    })
+    
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'Failed to submit application')
+    }
+    
+    return response.json()
+  },
+
+  async updateStatus(competitionId: string, participantId: string, status: string): Promise<Participation> {
+    const response = await fetch(`/api/competitions/${competitionId}/participants/${participantId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ status }),
+    })
+    
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'Failed to update participant status')
+    }
+    
+    return response.json()
+  },
+
+  async withdraw(competitionId: string, participantId: string): Promise<Participation> {
+    const response = await fetch(`/api/competitions/${competitionId}/participants/${participantId}`, {
+      method: 'DELETE',
+    })
+    
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'Failed to withdraw from competition')
+    }
+    
+    return response.json()
+  },
+
+  // Server-side methods (for API routes)
   async getByCompetition(competitionId: string): Promise<Participation[]> {
     const { data, error } = await supabase
       .from('participations')
@@ -336,6 +482,282 @@ export const storageService = {
   }
 }
 
+// Admin operations
+export const adminService = {
+  async getDashboardStats() {
+    const [
+      totalUsers,
+      totalCompetitions,
+      totalParticipations,
+      totalVotes,
+      recentActivity
+    ] = await Promise.all([
+      supabase.from('users').select('*', { count: 'exact', head: true }),
+      supabase.from('competitions').select('*', { count: 'exact', head: true }),
+      supabase.from('participations').select('*', { count: 'exact', head: true }),
+      supabase.from('votes').select('*', { count: 'exact', head: true }),
+      supabase
+        .from('competitions')
+        .select('id, title, status, created_at')
+        .order('created_at', { ascending: false })
+        .limit(5)
+    ])
+
+    // Get user stats by role
+    const { data: usersByRole } = await supabase
+      .from('users')
+      .select('role')
+
+    const roleStats = usersByRole?.reduce((acc: any, user) => {
+      acc[user.role] = (acc[user.role] || 0) + 1
+      return acc
+    }, {}) || {}
+
+    // Get competition stats by tier
+    const { data: competitionsByTier } = await supabase
+      .from('competitions')
+      .select('tier')
+
+    const tierStats = competitionsByTier?.reduce((acc: any, comp) => {
+      acc[comp.tier] = (acc[comp.tier] || 0) + 1
+      return acc
+    }, {}) || {}
+
+    return {
+      overview: {
+        total_users: totalUsers.count || 0,
+        total_competitions: totalCompetitions.count || 0,
+        total_participations: totalParticipations.count || 0,
+        total_votes: totalVotes.count || 0
+      },
+      user_stats: roleStats,
+      competition_stats: tierStats,
+      recent_activity: recentActivity.data || []
+    }
+  },
+
+  async getUsers(filters: {
+    limit?: number
+    offset?: number
+    search?: string
+    role?: string
+    verificationStatus?: string
+    suspended?: boolean
+  } = {}) {
+    let query = supabase
+      .from('users')
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    if (filters.search) {
+      query = query.or(`display_name.ilike.%${filters.search}%,email.ilike.%${filters.search}%`)
+    }
+
+    if (filters.role) {
+      query = query.eq('role', filters.role)
+    }
+
+    if (filters.verificationStatus) {
+      query = query.eq('verification_status', filters.verificationStatus)
+    }
+
+    if (filters.suspended !== undefined) {
+      query = query.eq('is_suspended', filters.suspended)
+    }
+
+    if (filters.limit) {
+      query = query.limit(filters.limit)
+    }
+
+    if (filters.offset) {
+      query = query.range(filters.offset, filters.offset + (filters.limit || 50) - 1)
+    }
+
+    const { data, error } = await query
+    if (error) throw error
+    return data
+  },
+
+  async getUserCount(filters: {
+    search?: string
+    role?: string
+    verificationStatus?: string
+    suspended?: boolean
+  } = {}) {
+    let query = supabase
+      .from('users')
+      .select('*', { count: 'exact', head: true })
+
+    if (filters.search) {
+      query = query.or(`display_name.ilike.%${filters.search}%,email.ilike.%${filters.search}%`)
+    }
+
+    if (filters.role) {
+      query = query.eq('role', filters.role)
+    }
+
+    if (filters.verificationStatus) {
+      query = query.eq('verification_status', filters.verificationStatus)
+    }
+
+    if (filters.suspended !== undefined) {
+      query = query.eq('is_suspended', filters.suspended)
+    }
+
+    const { count, error } = await query
+    if (error) throw error
+    return count || 0
+  },
+
+  async updateUser(userId: string, updates: any) {
+    const { data, error } = await supabase
+      .from('users')
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', userId)
+      .select()
+      .single()
+
+    if (error) throw error
+    return data
+  },
+
+  async getSystemLogs(filters: {
+    limit?: number
+    offset?: number
+    level?: string
+    category?: string
+  } = {}) {
+    // This would typically query a logs table
+    // For now, return mock data
+    return []
+  },
+
+  async getAuditLogs(filters: {
+    limit?: number
+    offset?: number
+    user_id?: string
+    action?: string
+  } = {}) {
+    // This would typically query an audit_logs table
+    // For now, return mock data
+    return []
+  }
+}
+
+// Notification operations
+export const notificationService = {
+  async getUserNotifications(userId: string, options: {
+    limit?: number
+    offset?: number
+    unreadOnly?: boolean
+    type?: string
+  } = {}) {
+    let query = supabase
+      .from('notifications')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+
+    if (options.unreadOnly) {
+      query = query.eq('read', false)
+    }
+
+    if (options.type) {
+      query = query.eq('type', options.type)
+    }
+
+    if (options.limit) {
+      query = query.limit(options.limit)
+    }
+
+    if (options.offset) {
+      query = query.range(options.offset, options.offset + (options.limit || 20) - 1)
+    }
+
+    const { data, error } = await query
+    if (error) throw error
+    return data
+  },
+
+  async getUnreadCount(userId: string): Promise<number> {
+    const { count, error } = await supabase
+      .from('notifications')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .eq('read', false)
+
+    if (error) throw error
+    return count || 0
+  },
+
+  async markAsRead(notificationId: string, userId: string) {
+    const { data, error } = await supabase
+      .from('notifications')
+      .update({ read: true, read_at: new Date().toISOString() })
+      .eq('id', notificationId)
+      .eq('user_id', userId)
+      .select()
+      .single()
+
+    if (error) throw error
+    return data
+  },
+
+  async markAllAsRead(userId: string) {
+    const { data, error } = await supabase
+      .from('notifications')
+      .update({ read: true, read_at: new Date().toISOString() })
+      .eq('user_id', userId)
+      .eq('read', false)
+      .select()
+
+    if (error) throw error
+    return data
+  },
+
+  async createNotification(notificationData: {
+    user_id: string
+    type: string
+    title: string
+    message: string
+    data?: any
+    action_url?: string
+  }) {
+    const { data, error } = await supabase
+      .from('notifications')
+      .insert({
+        ...notificationData,
+        created_at: new Date().toISOString()
+      })
+      .select()
+      .single()
+
+    if (error) throw error
+    return data
+  },
+
+  async sendEmail(to: string, subject: string, html: string) {
+    // This would integrate with Resend or another email service
+    // For now, we'll just log it
+    console.log('Email notification:', { to, subject, html })
+    
+    // In production, you would use Resend:
+    // const { Resend } = require('resend')
+    // const resend = new Resend(process.env.RESEND_API_KEY)
+    // return await resend.emails.send({
+    //   from: 'noreply@hubspotcompetition.com',
+    //   to,
+    //   subject,
+    //   html
+    // })
+    
+    return { success: true }
+  }
+}
+
 // Real-time subscriptions
 export const realtimeService = {
   subscribeToLeaderboard(
@@ -370,6 +792,25 @@ export const realtimeService = {
           schema: 'public',
           table: 'votes',
           filter: `competition_id=eq.${competitionId}`
+        },
+        callback
+      )
+      .subscribe()
+  },
+
+  subscribeToNotifications(
+    userId: string,
+    callback: (payload: any) => void
+  ) {
+    return supabase
+      .channel(`notifications:${userId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${userId}`
         },
         callback
       )

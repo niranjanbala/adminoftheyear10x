@@ -84,8 +84,8 @@ export function UserMenu() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          Profile
+        <DropdownMenuItem asChild>
+          <a href="/profile">Profile</a>
         </DropdownMenuItem>
         <DropdownMenuItem>
           Settings
