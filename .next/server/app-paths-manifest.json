@@ -1,0 +1,9 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/auth/refresh/route": "app/api/auth/refresh/route.js",
+  "/api/auth/logout/route": "app/api/auth/logout/route.js",
+  "/api/auth/hubspot/initiate/route": "app/api/auth/hubspot/initiate/route.js",
+  "/api/auth/hubspot/callback/route": "app/api/auth/hubspot/callback/route.js",
+  "/auth/error/page": "app/auth/error/page.js",
+  "/page": "app/page.js"
+}
